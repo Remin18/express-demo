@@ -3,6 +3,11 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.dev
+    environment:
+      DB_HOST: db
+      DB_USER: root
+      DB_PASSWORD: password
+      DB_NAME: todo_db
     volumes:
       - ./src:/usr/src/app/src
       - ./nodemon.json:/usr/src/app/nodemon.json
