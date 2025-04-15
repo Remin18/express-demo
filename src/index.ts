@@ -60,6 +60,30 @@ app.delete('/post/:id', async (req: Request, res: Response) => {
   res.status(200).send()
 });
 
+app.get('/post/search', async (req: Request, res: Response) => {
+  try {
+    const { query } = req.query;
+
+    if (!query) {
+      return res.status(400).send({ error: '検索キーワードを指定してください' });
+    }
+
+    const searchQuery = `%${query}%`;
+    const [result] = await pool.query(
+      `SELECT * FROM todos
+       WHERE title LIKE ? OR content LIKE ?`,
+      [searchQuery, searchQuery]
+    );
+
+    res.send({
+      "todos": result
+    });
+  } catch (error) {
+    console.error('Error searching todos:', error);
+    res.status(500).send({ error: 'データベースエラー' });
+  }
+});
+
 app.listen(port, () => {
   console.log(`Server running at port:${port}/`);
 });
