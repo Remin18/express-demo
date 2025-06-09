@@ -1,0 +1,195 @@
+openapi: 3.0.3
+info:
+  title: Todo API
+  description: Todoアイテムの管理を行うためのRESTful API
+  version: 1.0.0
+  contact:
+    name: API Support
+servers:
+  - url: http://localhost:3000
+    description: Development server
+
+paths:
+  /post:
+    get:
+      summary: 全てのTodoアイテムを取得
+      description: データベースに保存されている全てのTodoアイテムを取得します
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  todos:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Todo'
+              example:
+                todos:
+                  - id: 1
+                    title: "サンプルタスク"
+                    content: "タスクの詳細"
+                    status: "TODO"
+                    created_at: "2024-01-01T00:00:00.000Z"
+                    updated_at: "2024-01-01T00:00:00.000Z"
+
+    post:
+      summary: 新しいTodoアイテムを作成
+      description: 新しいTodoアイテムをデータベースに追加します
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - title
+                - content
+              properties:
+                title:
+                  type: string
+                  description: Todoのタイトル
+                  example: "新しいタスク"
+                content:
+                  type: string
+                  description: Todoの内容
+                  example: "タスクの詳細説明"
+      responses:
+        '201':
+          description: 作成成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  todo:
+                    $ref: '#/components/schemas/Todo'
+              example:
+                todo:
+                  id: 2
+                  title: "新しいタスク"
+                  content: "タスクの詳細説明"
+                  status: "TODO"
+                  created_at: "2024-01-01T00:00:00.000Z"
+                  updated_at: "2024-01-01T00:00:00.000Z"
+        '500':
+          description: データベースエラー
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error: "Database error"
+
+  /post/{id}:
+    delete:
+      summary: Todoアイテムを削除
+      description: 指定されたIDのTodoアイテムを削除します
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 削除するTodoのID
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: 削除成功
+        '500':
+          description: データベースエラー
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /post/search:
+    get:
+      summary: Todoアイテムを検索
+      description: キーワードでTodoアイテムのタイトルまたは内容を検索します
+      parameters:
+        - name: query
+          in: query
+          required: true
+          description: 検索キーワード
+          schema:
+            type: string
+            example: "サンプル"
+      responses:
+        '200':
+          description: 検索成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  todos:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Todo'
+              example:
+                todos:
+                  - id: 1
+                    title: "サンプルタスク"
+                    content: "タスクの詳細"
+                    status: "TODO"
+                    created_at: "2024-01-01T00:00:00.000Z"
+                    updated_at: "2024-01-01T00:00:00.000Z"
+        '400':
+          description: バリデーションエラー
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error: "検索キーワードを指定してください"
+        '500':
+          description: データベースエラー
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error: "データベースエラー"
+
+components:
+  schemas:
+    Todo:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: TodoのID
+          example: 1
+        title:
+          type: string
+          description: Todoのタイトル
+          example: "サンプルタスク"
+        content:
+          type: string
+          description: Todoの内容
+          example: "タスクの詳細"
+        status:
+          type: string
+          description: Todoのステータス
+          example: "TODO"
+        created_at:
+          type: string
+          format: date-time
+          description: 作成日時
+          example: "2024-01-01T00:00:00.000Z"
+        updated_at:
+          type: string
+          format: date-time
+          description: 更新日時
+          example: "2024-01-01T00:00:00.000Z"
+    
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: エラーメッセージ
+          example: "エラーが発生しました"
