@@ -8,7 +8,7 @@ RUN npm ci
 COPY . .
 RUN npm run build
 
-FROM node:22-slim
+FROM node:22.19.0-trixie-slim
 
 WORKDIR /usr/src/app
 
